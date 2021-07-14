@@ -21,6 +21,8 @@ public class DeviceBootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (Objects.equals(intent.getAction(), "android.intent.action.BOOT_COMPLETED")) {
+            // 폰 재부팅을 한 경우에도 앱 알람이 동작하도록..
+            // 재부팅한 경우에는 sharedPreference에 저장해둔 시간 값을 받는다.
 
             // on device boot complete, reset the alarm
             Intent alarmIntent = new Intent(context, AlarmReceiver.class);

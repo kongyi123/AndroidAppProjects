@@ -1,8 +1,11 @@
 package com.example.alarmapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 
 import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,7 +14,11 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -30,6 +37,42 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+//        PowerManager powerManager = (PowerManager)getSystemService(Context.POWER_SERVICE);
+//        PowerManager.WakeLock wakeLock = powerManager.newWakeLock( PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "WAKELOCK");
+//        wakeLock.acquire();
+
+        String channelName ="매일 알람 채널";
+        String description = "매일 정해진 시간에 알람합니다.";
+        int importance = NotificationManager.IMPORTANCE_HIGH; //소리와 알림메시지를 같이 보여줌
+
+        NotificationChannel channel = new NotificationChannel("default", channelName, importance);
+        channel.setDescription(description);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (notificationManager != null) {
+            // 노티피케이션 채널을 시스템에 등록
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "default");
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingI = PendingIntent.getActivity(this, 0,
+                notificationIntent, 0);
+
+
+        builder.setAutoCancel(true)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setTicker("{Time to watch some cool stuff!}")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("알림")
+                .setContentText("공영인이 만든 알림")
+                .setContentInfo("INFO")
+                .setContentIntent(pendingI)
+                .setOngoing(true)
+                .setPriority(NotificationCompat.PRIORITY_MAX);
+        notificationManager.notify(1234, builder.build());
+
 
         final TimePicker picker=(TimePicker)findViewById(R.id.timePicker);
         picker.setIs24HourView(true);
@@ -131,7 +174,11 @@ public class MainActivity extends AppCompatActivity {
         PackageManager pm = this.getPackageManager();
         ComponentName receiver = new ComponentName(this, DeviceBootReceiver.class);
         Intent alarmIntent = new Intent(this, AlarmReceiver.class);
+        alarmIntent.putExtra("state","alarm on");
+
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
+        // 알람 Broadcast Intent를 만든다. -> alarmManager를 통해 특정시각에 broadcast 날리도록 예약할것이다.
+
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
 
@@ -145,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
                         AlarmManager.INTERVAL_DAY, pendingIntent);
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent); // 예약
                 }
             }
 
@@ -164,6 +211,11 @@ public class MainActivity extends AppCompatActivity {
 //                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
 //                    PackageManager.DONT_KILL_APP);
 //        }
+    }
+
+    public void onClick(View view) {
+        Intent alarmIntent = new Intent(this, AlarmReceiver.class);
+        alarmIntent.putExtra("state","alarm off");
     }
 
 }

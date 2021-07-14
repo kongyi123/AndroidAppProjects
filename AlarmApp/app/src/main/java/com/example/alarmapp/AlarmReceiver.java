@@ -7,9 +7,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.view.WindowManager;
 import android.widget.Toast;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -19,9 +27,29 @@ import androidx.core.app.NotificationCompat;
 import static android.content.Context.MODE_PRIVATE;
 
 public class AlarmReceiver extends BroadcastReceiver {
+
+    Context context;
     @Override
     public void onReceive(Context context, Intent intent) {
+        // 알람을 BroadcastReceiver로 받는다.
+        // 받으면 Noti를 주면됨.
 
+        this.context = context;
+        // intent로부터 전달받은 string
+        String get_yout_string = intent.getExtras().getString("state");
+
+        // RingtonePlayingService 서비스 intent 생성
+        Intent service_intent = new Intent(context, RingtonePlayingService.class);
+
+        // RingtonePlayinService로 extra string값 보내기
+        service_intent.putExtra("state", get_yout_string);
+        // start the ringtone service
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
+            this.context.startForegroundService(service_intent);
+        }else{
+            this.context.startService(service_intent);
+        }
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         Intent notificationIntent = new Intent(context, MainActivity.class);
@@ -61,15 +89,30 @@ public class AlarmReceiver extends BroadcastReceiver {
                 .setWhen(System.currentTimeMillis())
 
                 .setTicker("{Time to watch some cool stuff!}")
-                .setContentTitle("상태바 드래그시 보이는 타이틀")
-                .setContentText("상태바 드래그시 보이는 서브타이틀")
+                .setContentTitle("알림")
+                .setContentText("공영인이 만든 알림")
                 .setContentInfo("INFO")
-                .setContentIntent(pendingI);
+                .setContentIntent(pendingI)
+                .setOngoing(true)
+                .setPriority(NotificationCompat.PRIORITY_MAX);
 
         if (notificationManager != null) {
 
+
+
             // 노티피케이션 동작시킴
             notificationManager.notify(1234, builder.build());
+
+            Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+
+            long[] timings = new long[]{1000L, 1000L, 1000L, 1000L, 1000L};
+            int[] amplitudes = new int[]{0, 100, 200, 100, 200};
+
+            //vibrator.vibrate(VibrationEffect.createOneShot(1000, 50));
+
+
+            vibrator.vibrate(VibrationEffect.createWaveform(timings, amplitudes,-1));
+
 
             Calendar nextNotifyTime = Calendar.getInstance();
 
