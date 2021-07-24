@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
+import android.widget.EditText;
 
 import java.util.Calendar;
 
@@ -33,6 +34,8 @@ public class AlarmReceiver extends BroadcastReceiver {
     }
 //
     private void doNotify() {
+        String content = AlarmNotification.INSTANCE.getText();
+
         Intent contentIntent = new Intent(context, MainActivity.class);
         PendingIntent contentPendingIntent = PendingIntent.getActivity(
                         context,
@@ -48,7 +51,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         builder.setSmallIcon(R.drawable.ic_launcher_background);
         builder.setContentTitle(context.getString(R.string.app_name));
-        builder.setContentText("동일 간격 노티 알람 만들기!!");
+        builder.setContentText(content);
         builder.setContentIntent(contentPendingIntent);
         builder.setAutoCancel(true);
 //        builder.setOngoing(true); // Ongoing 붙이면 wear로 noti 안감.

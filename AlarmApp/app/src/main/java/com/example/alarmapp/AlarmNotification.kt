@@ -12,6 +12,8 @@ private const val NOTIFICATION_ID = 1
 
 object AlarmNotification {
 
+    var text:String? = null
+
     fun createNotification(
             context: Context
     ) : Notification {

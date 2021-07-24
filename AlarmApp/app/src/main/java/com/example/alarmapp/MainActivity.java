@@ -32,6 +32,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClick(View view) {
+        EditText et = findViewById(R.id.notification_content);
+        AlarmNotification.INSTANCE.setText(et.getText().toString());
+
         Intent intent = new Intent(getApplicationContext(), MyService.class);
         intent.putExtra("command", "show");
 //        startService(intent);
@@ -69,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
         EditText et = findViewById(R.id.edit_text_millisecond);
         String text = et.getText().toString();
         Long sec = Long.parseLong(text);
+
         if (dailyNotify) {
             if (alarmManager != null) {
                 //alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent); // 예약
