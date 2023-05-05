@@ -81,7 +81,7 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
 
     void refresh() {
         if (ready == 0) {
-            while (arr == null || arr.size() < 179);
+            while (arr == null || arr.size() < 5);
             ready = 1;
             int n = arr.size();
             for (int i = 0;i < n;i ++) {
@@ -189,10 +189,10 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         // Initialize credentials and service object.
         mCredential = GoogleAccountCredential.usingOAuth2(getApplicationContext(), Arrays.asList(SCOPES)).setBackOff(new ExponentialBackOff());
 
-        prevBtn.setVisibility(View.GONE);
-        nextBtn.setVisibility(View.GONE);
-        newBtn.setVisibility(View.GONE);
-        saveBtn.setVisibility(View.GONE);
+//        prevBtn.setVisibility(View.GONE);
+//        nextBtn.setVisibility(View.GONE);
+//        newBtn.setVisibility(View.GONE);
+//        saveBtn.setVisibility(View.GONE);
 
 
         do { // 액티비티 사이클 에서의 같은 날짜 생성 또 되는 것에대한 디버깅
@@ -415,7 +415,7 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
 
         private void getDataFromApi() throws IOException, GeneralSecurityException {
             String spreadsheetId = "195wifwlqrLelrFp2-Zs52hZPBa-WKlbIZBZPsM-gpkc";
-            List<String> ranges = Arrays.asList("일일 일지!A4:O182");
+            List<String> ranges = Arrays.asList("일일 일지!B4:D9");
             Sheets sheetsService = createSheetsService();
             BatchGetValuesResponse result = sheetsService.spreadsheets().values().batchGet(spreadsheetId).setRanges(ranges).execute();
             aa = result.getValueRanges().get(0);
